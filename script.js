@@ -1,4 +1,3 @@
-// Variables y estado global
 const btnJugar = document.getElementById('btnJugar');
 const btnCalcular = document.getElementById('btnCalcular');
 const juegoUI = document.getElementById('juegoUI');
@@ -54,6 +53,7 @@ function mostrarMenu() {
   calculadora.classList.add('hidden');
   document.getElementById('menu').style.display = 'flex';
   mensaje.textContent = "";
+  resultado.textContent = "";
   puzzleActual = null;
   juegoPausado = false;
 }
@@ -63,6 +63,7 @@ function mostrarJuego() {
   calculadora.classList.add('hidden');
   document.getElementById('menu').style.display = 'none';
   mensaje.textContent = "Usa las flechas para moverte. Resuelve puzzles para abrir puertas.";
+  resultado.textContent = "";
   iniciarJuego();
 }
 
@@ -208,9 +209,26 @@ btnEval.onclick = () => {
     const resultadoCorrecto = math.evaluate(puzzle.respuesta);
     const esCorrecto = math.equal(resultadoUsuario, resultadoCorrecto);
 
+    // Formatear resultado para mostrar
+    let textoResultado = "";
+    if (math.typeOf(resultadoUsuario) === "Complex") {
+      const re = resultadoUsuario.re;
+      const im = resultadoUsuario.im;
+      if (re !== 0) textoResultado += re;
+      if (im !== 0) {
+        if (im > 0 && re !== 0) textoResultado += " + ";
+        else if (im < 0 && re !== 0) textoResultado += " - ";
+        else if (im < 0 && re === 0) textoResultado += "-";
+        textoResultado += `${Math.abs(im)}i`;
+      }
+      if (textoResultado === "") textoResultado = "0";
+    } else {
+      textoResultado = resultadoUsuario.toString();
+    }
+
     if (esCorrecto) {
       xp += 10;
-      mensaje.textContent = "¡Correcto! Has ganado 10 XP.";
+      resultado.textContent = `✔️ Resultado: ${textoResultado}\n¡Correcto! Has ganado 10 XP.`;
 
       for (const [pos, data] of Object.entries(puertas)) {
         if (data.puzzleId === puzzleActual) {
@@ -222,12 +240,18 @@ btnEval.onclick = () => {
 
       puzzleActual = null;
       juegoPausado = false;
-      mostrarJuego();
+
+      setTimeout(() => {
+        mostrarJuego();
+      }, 1500); // espera 1.5 seg antes de volver al juego
     } else {
-      manejarIntentoFallido(puerta);
+      const intentosRestantes = intentosMaximos - puerta.intentos;
+      resultado.textContent = `❌ Resultado: ${textoResultado}\nIncorrecto. Intentos restantes: ${intentosRestantes}`;
+      inputExpr.value = "";
+      inputExpr.focus();
     }
   } catch (error) {
-    mensaje.textContent = "Expresión inválida. Intentá de nuevo.";
+    resultado.textContent = "Expresión inválida. Intentá de nuevo.";
     inputExpr.focus();
   }
 };
