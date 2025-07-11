@@ -145,7 +145,7 @@ const sketch = (p) => {
 
   p.keyPressed = () => {
     if (juegoPausado) return;
-    if (targetX !== playerX || targetY !== playerY) return;
+    if (Math.round(playerX) !== targetX || Math.round(playerY) !== targetY) return;
 
     let dx = 0, dy = 0;
     if (p.keyCode === p.LEFT_ARROW) dx = -1;
@@ -157,8 +157,8 @@ const sketch = (p) => {
 };
 
 function mover(dx, dy) {
-  const newX = playerX + dx;
-  const newY = playerY + dy;
+  const newX = targetX + dx;
+  const newY = targetY + dy;
   if (newX >= 0 && newX < MAP_COLS && newY >= 0 && newY < MAP_ROWS) {
     let tile = mapa[newY][newX];
     if (tile === 0) {
