@@ -1,3 +1,4 @@
+// Variables y estado global
 const btnJugar = document.getElementById('btnJugar');
 const btnCalcular = document.getElementById('btnCalcular');
 const juegoUI = document.getElementById('juegoUI');
@@ -13,10 +14,6 @@ const TILE_SIZE = 40;
 const MAP_ROWS = 6;
 const MAP_COLS = 10;
 
-// Mapa:
-// 0 = camino libre
-// 1 = muro
-// 2 = puerta bloqueada
 const mapa = [
   [1,1,1,1,1,1,1,1,1,1],
   [1,0,0,2,0,0,0,0,0,1],
@@ -34,17 +31,16 @@ let puertas = {
 const puzzles = {
   "complejo1": {
     tipo: "complejo",
-    pregunta: "Resuelve el número complejo: 4+1i",
+    pregunta: "Resuelve: 2+3i + 2-2i",
     respuesta: "4+1i",
   },
   "aritmetica1": {
     tipo: "aritmetica",
-    pregunta: "¿Cuánto es 5 + 3?",
-    respuesta: "8",
+    pregunta: "¿Cuánto es 2+2?",
+    respuesta: "4",
   }
 };
 
-// Estado jugador
 let playerX = 1;
 let playerY = 1;
 let xp = 0;
@@ -94,7 +90,6 @@ function iniciarJuego() {
   canvas = new p5(sketch, 'juegoUI');
 }
 
-// Función p5 principal
 const sketch = (p) => {
   p.setup = () => {
     p.createCanvas(MAP_COLS * TILE_SIZE, MAP_ROWS * TILE_SIZE + 60);
@@ -125,13 +120,11 @@ const sketch = (p) => {
         playerX = newX;
         playerY = newY;
       } else if(tile === 2) {
-        // puerta bloqueada
         let key = `${newX},${newY}`;
         if(puertas[key].abierta) {
           playerX = newX;
           playerY = newY;
         } else {
-          // mostrar puzzle
           juegoPausado = true;
           puzzleActual = puertas[key].puzzleId;
           mensaje.textContent = puzzles[puzzleActual].pregunta + ` (Intentos restantes: ${intentosMaximos - puertas[key].intentos})`;
@@ -148,7 +141,7 @@ function drawMap(p) {
   for(let y=0; y<MAP_ROWS; y++) {
     for(let x=0; x<MAP_COLS; x++) {
       if(mapa[y][x] === 1) p.fill(40,90,30);
-      else if(mapa[y][x] === 2) p.fill(200,80,0); // puertas anaranjadas
+      else if(mapa[y][x] === 2) p.fill(200,80,0);
       else p.fill(150,200,150);
 
       p.rect(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE);
@@ -173,42 +166,53 @@ function drawHUD(p) {
 
 // --- CALCULADORA ---
 btnEval.onclick = () => {
-  if(!puzzleActual) return;
+  if (!puzzleActual) return;
 
-  let userResp = inputExpr.value.trim();
-
-  // validar respuesta simple
-  const correctResp = puzzles[puzzleActual].respuesta;
-
+  const userResp = inputExpr.value.trim();
+  const puzzle = puzzles[puzzleActual];
   const puerta = Object.entries(puertas).find(([pos, data]) => data.puzzleId === puzzleActual)[1];
+
   puerta.intentos++;
 
-  if(userResp.toLowerCase() === correctResp.toLowerCase()) {
-    xp += 10;
-    mensaje.textContent = "¡Correcto! Has ganado 10 XP.";
-    // abrir puerta
-    for(const [pos, data] of Object.entries(puertas)) {
-      if(data.puzzleId === puzzleActual) {
-        data.abierta = true;
-        // cambiar mapa tile puerta a camino
-        const [x, y] = pos.split(',').map(Number);
-        mapa[y][x] = 0;
+  try {
+    const resultadoUsuario = math.evaluate(userResp);
+    const resultadoCorrecto = math.evaluate(puzzle.respuesta);
+    const esCorrecto = math.equal(resultadoUsuario, resultadoCorrecto);
+
+    if (esCorrecto) {
+      xp += 10;
+      mensaje.textContent = "¡Correcto! Has ganado 10 XP.";
+
+      for (const [pos, data] of Object.entries(puertas)) {
+        if (data.puzzleId === puzzleActual) {
+          data.abierta = true;
+          const [x, y] = pos.split(',').map(Number);
+          mapa[y][x] = 0;
+        }
       }
-    }
-    puzzleActual = null;
-    juegoPausado = false;
-    mostrarJuego();
-  } else {
-    const intentosRestantes = intentosMaximos - puerta.intentos;
-    if(intentosRestantes <= 0) {
-      mensaje.textContent = "Has agotado tus intentos. Puzzle bloqueado.";
+
       puzzleActual = null;
       juegoPausado = false;
       mostrarJuego();
     } else {
-      mensaje.textContent = `Incorrecto. Intenta de nuevo. Intentos restantes: ${intentosRestantes}`;
-      inputExpr.value = "";
-      inputExpr.focus();
+      manejarIntentoFallido(puerta);
     }
+  } catch (error) {
+    mensaje.textContent = "Expresión inválida. Intentá de nuevo.";
+    inputExpr.focus();
   }
 };
+
+function manejarIntentoFallido(puerta) {
+  const intentosRestantes = intentosMaximos - puerta.intentos;
+  if (intentosRestantes <= 0) {
+    mensaje.textContent = "Has agotado tus intentos. Puzzle bloqueado.";
+    puzzleActual = null;
+    juegoPausado = false;
+    mostrarJuego();
+  } else {
+    mensaje.textContent = `Incorrecto. Intentá de nuevo. Intentos restantes: ${intentosRestantes}`;
+    inputExpr.value = "";
+    inputExpr.focus();
+  }
+}
