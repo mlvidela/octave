@@ -2,10 +2,11 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Octave - Mini Zelda Puzzle Educativo</title>
+  <title>Octave</title>
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjs/11.8.0/math.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
 </head>
 <body>
   <div id="menu">
@@ -13,16 +14,52 @@
     <button id="btnCalcular">Calcular</button>
   </div>
 
-<!-- Juego -->
-<div id="juegoUI" class="hidden">
-  <div id="mensaje"></div>
-  <button id="btnVolverJuego" class="btnVolver">Volver</button>
-</div>
+  <!-- Juego -->
+  <div id="juego" class="hidden">
+    <div id="mensaje"></div>
+
+    <!-- Canvas se inserta dinámicamente -->
+    <div id="xpBarContainer">
+      <div id="xpBar"></div>
+    </div>
+
+    <div id="mapa">
+      <h2>🌍 Mapa 🌍</h2>
+      <ul>
+        <li>🏡 <strong>Math Village</strong></li>
+        <li>🔢 <strong>Bosque del Álgebra</strong></li>
+        <li>📐 <strong>Ruinas de Geometría</strong></li>
+        <li>⚡ <strong>Templo de Números Complejos</strong></li>
+        <li>🧪 <strong>Cueva de Funciones</strong></li>
+      </ul>
+      <h3>🧩 Primera mazmorra: Templo de las Letras Perdidas 🧩</h3>
+      <ol>
+        <li><button class="mapa-desafio-btn" data-puzzle="sala1">Sala 1: Resolver 3x + 2 = 11</button></li>
+        <li><button class="mapa-desafio-btn" data-puzzle="sala2">Sala 2: Factorizá x² + 5x + 6</button></li>
+        <li><button class="mapa-desafio-btn" data-puzzle="sala3">Sala 3: Mensaje del NPC</button></li>
+        <li><button class="mapa-desafio-btn" data-puzzle="jefe">Jefe: Resolver x² = 16</button></li>
+      </ol>
+      <p>Obtenés la Pluma de Salto para acceder a nuevas zonas 🏆</p>
+    </div>
+
+    <div id="controles" class="hidden">
+      <div class="fila-flechas">
+        <button id="flechaArriba" class="flecha"><i class="bi bi-arrow-up-circle-fill"></i></button>
+      </div>
+      <div class="fila-flechas">
+        <button id="flechaIzquierda" class="flecha"><i class="bi bi-arrow-left-circle-fill"></i></button>
+        <button id="flechaAbajo" class="flecha"><i class="bi bi-arrow-down-circle-fill"></i></button>
+        <button id="flechaDerecha" class="flecha"><i class="bi bi-arrow-right-circle-fill"></i></button>
+      </div>
+    </div>
+
+    <button id="btnVolverJuego" class="btnVolver">Volver</button>
+  </div>
 
   <!-- Calculadora -->
   <div id="calculadora" class="hidden">
     <input id="inputExpr" placeholder="Ingresa expresión (ej: 4+1i)" />
-    <button id="btnEval">Evaluar</button>
+    <button id="btnEval">Resultado</button>
     <div id="resultado"></div>
     <button id="btnVolverCalc" class="btnVolver">Volver</button>
   </div>
