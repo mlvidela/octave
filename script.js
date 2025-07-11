@@ -73,6 +73,13 @@ function mostrarCalculadora() {
   document.getElementById('menu').style.display = 'none';
   resultado.textContent = "";
   inputExpr.value = "";
+
+  // Cambiar placeholder según modo
+  if (puzzleActual) {
+    inputExpr.placeholder = puzzles[puzzleActual].pregunta;
+  } else {
+    inputExpr.placeholder = "Ingresa expresión (ej: 4+1i)";
+  }
 }
 
 // Evento botones menú
@@ -172,7 +179,6 @@ btnEval.onclick = () => {
     try {
       const resultadoEvaluado = math.evaluate(userResp);
 
-      // Mostrar resultados complejos con formato "a + bi"
       if (math.typeOf(resultadoEvaluado) === "Complex") {
         const re = resultadoEvaluado.re;
         const im = resultadoEvaluado.im;
@@ -209,7 +215,6 @@ btnEval.onclick = () => {
     const resultadoCorrecto = math.evaluate(puzzle.respuesta);
     const esCorrecto = math.equal(resultadoUsuario, resultadoCorrecto);
 
-    // Formatear resultado para mostrar
     let textoResultado = "";
     if (math.typeOf(resultadoUsuario) === "Complex") {
       const re = resultadoUsuario.re;
@@ -243,7 +248,7 @@ btnEval.onclick = () => {
 
       setTimeout(() => {
         mostrarJuego();
-      }, 1500); // espera 1.5 seg antes de volver al juego
+      }, 1500);
     } else {
       const intentosRestantes = intentosMaximos - puerta.intentos;
       resultado.textContent = `❌ Resultado: ${textoResultado}\nIncorrecto. Intentos restantes: ${intentosRestantes}`;
