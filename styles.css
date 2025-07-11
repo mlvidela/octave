@@ -12,7 +12,7 @@ body {
 }
 
 #menu {
-  display: absolute;
+  display: relative;
   gap: 40px;
   justify-content: center;
   padding: 20px 0;
