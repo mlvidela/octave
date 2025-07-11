@@ -5,19 +5,30 @@
 }
 
 body {
-  background: #142036;
+  background-image: url('Fondo.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+
   color: white;
   font-family: monospace;
   height: 100vh;
+
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
 }
 
 #menu {
   display: flex;
   gap: 40px;
+  justify-content: center;
+  padding: 20px 0;
+  background: rgba(0, 0, 0, 0.6);
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 10;
 }
 
 button {
@@ -39,17 +50,27 @@ button:hover {
   display: none;
 }
 
-#juegoUI, #calculadora {
-  margin-top: 20px;
+#juegoUI {
+  margin-top: 100px;
+  width: 100%;
+  max-width: 600px;
+  align-self: center;
+  text-align: center;
+}
+
+#calculadora {
+  margin-top: 100px;
   width: 100%;
   max-width: 600px;
   text-align: center;
+  align-self: center;
 }
 
 #mensaje, #resultado {
   margin: 10px 0;
   min-height: 30px;
   font-size: 18px;
+  white-space: pre-line;
 }
 
 input {
