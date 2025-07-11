@@ -2,9 +2,10 @@ const btnJugar = document.getElementById('btnJugar');
 const btnCalcular = document.getElementById('btnCalcular');
 const juegoUI = document.getElementById('juegoUI');
 const calculadora = document.getElementById('calculadora');
-const btnVolverJuego = document.getElementById('btnVolverJuego');
 const btnVolverCalc = document.getElementById('btnVolverCalc');
-const mensaje = document.getElementById('mensaje');
+const mensaje = document.createElement('div');
+mensaje.id = 'mensaje';
+juegoUI.appendChild(mensaje);
 const inputExpr = document.getElementById('inputExpr');
 const btnEval = document.getElementById('btnEval');
 const resultado = document.getElementById('resultado');
@@ -47,11 +48,11 @@ let juegoPausado = false;
 let puzzleActual = null;
 let intentosMaximos = 3;
 
-// Mostrar/ocultar secciones
+// Mostrar/ocultar secciones usando clase .hidden
 function mostrarMenu() {
   juegoUI.classList.add('hidden');
   calculadora.classList.add('hidden');
-  document.getElementById('menu').style.display = 'flex';
+  document.getElementById('menu').classList.remove('hidden');
   mensaje.textContent = "";
   resultado.textContent = "";
   puzzleActual = null;
@@ -61,7 +62,7 @@ function mostrarMenu() {
 function mostrarJuego() {
   juegoUI.classList.remove('hidden');
   calculadora.classList.add('hidden');
-  document.getElementById('menu').style.display = 'none';
+  document.getElementById('menu').classList.add('hidden');
   mensaje.textContent = "Usa las flechas para moverte. Resuelve puzzles para abrir puertas.";
   resultado.textContent = "";
   iniciarJuego();
@@ -70,22 +71,22 @@ function mostrarJuego() {
 function mostrarCalculadora() {
   juegoUI.classList.add('hidden');
   calculadora.classList.remove('hidden');
-  document.getElementById('menu').style.display = 'none';
+  document.getElementById('menu').classList.add('hidden');
   resultado.textContent = "";
   inputExpr.value = "";
 
-  // Cambiar placeholder según modo
   if (puzzleActual) {
     inputExpr.placeholder = puzzles[puzzleActual].pregunta;
   } else {
     inputExpr.placeholder = "Ingresa expresión (ej: 4+1i)";
   }
+
+  inputExpr.focus();
 }
 
-// Evento botones menú
+// Eventos botones menú
 btnJugar.onclick = mostrarJuego;
 btnCalcular.onclick = mostrarCalculadora;
-btnVolverJuego.onclick = mostrarMenu;
 btnVolverCalc.onclick = mostrarMenu;
 
 // --- JUEGO con p5.js ---
@@ -135,8 +136,8 @@ const sketch = (p) => {
           puzzleActual = puertas[key].puzzleId;
           mensaje.textContent = puzzles[puzzleActual].pregunta + ` (Intentos restantes: ${intentosMaximos - puertas[key].intentos})`;
           inputExpr.value = "";
-          inputExpr.focus();
           mostrarCalculadora();
+          inputExpr.focus();
         }
       }
     }
@@ -250,10 +251,7 @@ btnEval.onclick = () => {
         mostrarJuego();
       }, 1500);
     } else {
-      const intentosRestantes = intentosMaximos - puerta.intentos;
-      resultado.textContent = `❌ Resultado: ${textoResultado}\nIncorrecto. Intentos restantes: ${intentosRestantes}`;
-      inputExpr.value = "";
-      inputExpr.focus();
+      manejarIntentoFallido(puerta);
     }
   } catch (error) {
     resultado.textContent = "Expresión inválida. Intentá de nuevo.";
@@ -267,10 +265,13 @@ function manejarIntentoFallido(puerta) {
     mensaje.textContent = "Has agotado tus intentos. Puzzle bloqueado.";
     puzzleActual = null;
     juegoPausado = false;
-    mostrarJuego();
+    setTimeout(mostrarJuego, 1500);
   } else {
     mensaje.textContent = `Incorrecto. Intentá de nuevo. Intentos restantes: ${intentosRestantes}`;
     inputExpr.value = "";
     inputExpr.focus();
   }
 }
+
+// Iniciar con menú visible
+mostrarMenu();
