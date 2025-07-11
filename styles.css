@@ -17,7 +17,7 @@ body {
   display: flex;
   flex-direction: column;
 
-  padding: 2rem 1.5rem; /* margen interno más pequeño para móviles */
+  padding: 3rem; /* margen interno más pequeño para móviles */
 }
 
 /* Menú fijo arriba */
