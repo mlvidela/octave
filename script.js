@@ -1,5 +1,3 @@
-// script.js
-
 const btnJugar = document.getElementById('btnJugar');
 const btnCalcular = document.getElementById('btnCalcular');
 const juego = document.getElementById('juego');
@@ -73,11 +71,7 @@ let canvas;
 
 function actualizarFondo() {
   const menu = document.getElementById('menu');
-  if (!menu.classList.contains('hidden')) {
-    document.body.style.backgroundImage = "url('Fondo.png')";
-  } else {
-    document.body.style.backgroundImage = "none";
-  }
+  document.body.style.backgroundImage = menu.classList.contains('hidden') ? "none" : "url('Fondo.png')";
 }
 
 function mostrarMenu() {
@@ -125,6 +119,13 @@ btnCalcular.onclick = mostrarCalculadora;
 btnVolverJuego.onclick = mostrarMenu;
 btnVolverCalc.onclick = mostrarMenu;
 
+document.querySelectorAll('.mapa-desafio-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const puzzleId = btn.getAttribute('data-puzzle');
+    abrirPuzzle(puzzleId);
+  });
+});
+
 function iniciarJuego() {
   if (canvas) canvas.remove();
   canvas = new p5(sketch, 'juego');
@@ -156,11 +157,16 @@ const sketch = (p) => {
   };
 };
 
+document.getElementById('flechaArriba').onclick = () => mover(0, -1);
+document.getElementById('flechaAbajo').onclick = () => mover(0, 1);
+document.getElementById('flechaIzquierda').onclick = () => mover(-1, 0);
+document.getElementById('flechaDerecha').onclick = () => mover(1, 0);
+
 function mover(dx, dy) {
   const newX = targetX + dx;
   const newY = targetY + dy;
   if (newX >= 0 && newX < MAP_COLS && newY >= 0 && newY < MAP_ROWS) {
-    let tile = mapa[newY][newX];
+    const tile = mapa[newY][newX];
     if (tile === 0) {
       targetX = newX;
       targetY = newY;
@@ -201,11 +207,6 @@ function drawHUD(p) {
   p.textAlign(p.LEFT, p.CENTER);
   p.text(`XP: ${xp}`, 20, MAP_ROWS * TILE_SIZE + 30);
 }
-
-document.getElementById('flechaArriba').onclick = () => mover(0, -1);
-document.getElementById('flechaAbajo').onclick = () => mover(0, 1);
-document.getElementById('flechaIzquierda').onclick = () => mover(-1, 0);
-document.getElementById('flechaDerecha').onclick = () => mover(1, 0);
 
 function abrirPuzzle(id) {
   if (!(id in puzzles)) return;
@@ -287,7 +288,7 @@ function manejarIntentoFallido(puerta) {
 
 function actualizarXPBar() {
   const porcentaje = Math.min(100, (xp / 100) * 100);
-  xpBar.style.width = `${porcentaje}%`;
+  if (xpBar) xpBar.style.width = `${porcentaje}%`;
 }
 
 mostrarMenu();
