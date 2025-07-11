@@ -47,7 +47,6 @@ let juegoPausado = false;
 let puzzleActual = null;
 let intentosMaximos = 3;
 
-// --- CONTROL DE FONDO ---
 function actualizarFondo() {
   const menu = document.getElementById('menu');
   if (!menu.classList.contains('hidden')) {
@@ -60,11 +59,11 @@ function actualizarFondo() {
   }
 }
 
-// Mostrar/ocultar secciones
+// Mostrar/ocultar secciones con clases
 function mostrarMenu() {
   juegoUI.classList.add('hidden');
   calculadora.classList.add('hidden');
-  document.getElementById('menu').style.display = 'flex';
+  document.getElementById('menu').classList.remove('hidden');
   mensaje.textContent = "";
   resultado.textContent = "";
   puzzleActual = null;
@@ -75,7 +74,7 @@ function mostrarMenu() {
 function mostrarJuego() {
   juegoUI.classList.remove('hidden');
   calculadora.classList.add('hidden');
-  document.getElementById('menu').style.display = 'none';
+  document.getElementById('menu').classList.add('hidden');
   mensaje.textContent = "Usa las flechas para moverte. Resuelve puzzles para abrir puertas.";
   resultado.textContent = "";
   iniciarJuego();
@@ -85,7 +84,7 @@ function mostrarJuego() {
 function mostrarCalculadora() {
   juegoUI.classList.add('hidden');
   calculadora.classList.remove('hidden');
-  document.getElementById('menu').style.display = 'none';
+  document.getElementById('menu').classList.add('hidden');
   resultado.textContent = "";
   inputExpr.value = "";
 
@@ -97,13 +96,13 @@ function mostrarCalculadora() {
   actualizarFondo();
 }
 
-// Evento botones menú
+// Botones
 btnJugar.onclick = mostrarJuego;
 btnCalcular.onclick = mostrarCalculadora;
 btnVolverJuego.onclick = mostrarMenu;
 btnVolverCalc.onclick = mostrarMenu;
 
-// --- JUEGO con p5.js ---
+// --- JUEGO p5 ---
 let canvas;
 
 function iniciarJuego() {
@@ -189,7 +188,6 @@ function drawHUD(p) {
 btnEval.onclick = () => {
   const userResp = inputExpr.value.trim();
 
-  // MODO LIBRE (desde botón "Calcular")
   if (!puzzleActual) {
     try {
       const resultadoEvaluado = math.evaluate(userResp);
@@ -219,7 +217,6 @@ btnEval.onclick = () => {
     return;
   }
 
-  // MODO JUEGO (resolver puzzle)
   const puzzle = puzzles[puzzleActual];
   const puerta = Object.entries(puertas).find(([pos, data]) => data.puzzleId === puzzleActual)[1];
 
@@ -290,5 +287,5 @@ function manejarIntentoFallido(puerta) {
   }
 }
 
-// Mostrar menú al cargar la página
+// Al cargar, mostrar menú
 mostrarMenu();
