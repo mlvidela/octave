@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Octave</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/p5@1.7.0/lib/p5.min.js"></script>
+</head>
+<body>
+  <div id="menu">
+    <button id="btnJugar">Jugar</button>
+    <button id="btnCalcular">Calcular</button>
+  </div>
+
+  <!-- Juego -->
+  <div id="juegoUI" class="hidden">
+    <div id="mensaje"></div>
+    <button id="btnVolverJuego" class="btnVolver">Volver</button>
+  </div>
+
+  <!-- Calculadora -->
+  <div id="calculadora" class="hidden">
+    <input id="inputExpr" placeholder="Ingresa expresión (ej: 4+1i)" />
+    <button id="btnEval">Evaluar</button>
+    <div id="resultado"></div>
+    <button id="btnVolverCalc" class="btnVolver">Volver</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
