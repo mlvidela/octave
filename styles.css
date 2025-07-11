@@ -1,16 +1,10 @@
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-
 body {
   background-image: url('Fondo.png');
   background-repeat: no-repeat;
-  background-position: center center;
+  background-position: centain;
   background-size: cover;
 
-  color: white;
+  color: green;
   font-family: monospace;
   height: 100vh;
 
@@ -19,7 +13,7 @@ body {
 }
 
 #menu {
-  display: flex;
+  display: absolute;
   gap: 40px;
   justify-content: center;
   padding: 20px 0;
