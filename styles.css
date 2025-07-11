@@ -2,16 +2,11 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
-  background-image: url('Fondo.png');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: contain;
-  min-height: 70vh;
 }
 
 body {
-  color: blue;
+  background-color: #142036; /* azul oscuro de fondo */
+  color: white;
   font-family: monospace;
   min-height: 100vh;
 
@@ -21,7 +16,19 @@ body {
   padding: 3rem;
 }
 
-/* Menú fijo arriba */
+/* Fondo imagen solo cuando #menu está visible */
+#menu:not(.hidden) ~ body,
+#menu:not(.hidden) {
+  background-image: url('Fondo.png');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  min-height: 70vh;
+}
+
+/* Alternativa: si no funciona bien con selector hermano, mejor se agrega o quita clase con JS */
+
+// Menú fijo arriba
 #menu {
   position: fixed;
   top: 0;
