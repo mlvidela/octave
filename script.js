@@ -2,10 +2,9 @@ const btnJugar = document.getElementById('btnJugar');
 const btnCalcular = document.getElementById('btnCalcular');
 const juegoUI = document.getElementById('juegoUI');
 const calculadora = document.getElementById('calculadora');
+const btnVolverJuego = document.getElementById('btnVolverJuego');
 const btnVolverCalc = document.getElementById('btnVolverCalc');
-const mensaje = document.createElement('div');
-mensaje.id = 'mensaje';
-juegoUI.appendChild(mensaje);
+const mensaje = document.getElementById('mensaje');
 const inputExpr = document.getElementById('inputExpr');
 const btnEval = document.getElementById('btnEval');
 const resultado = document.getElementById('resultado');
@@ -48,7 +47,20 @@ let juegoPausado = false;
 let puzzleActual = null;
 let intentosMaximos = 3;
 
-// Mostrar/ocultar secciones usando clase .hidden
+// Fondo dinámico solo para el menú
+function actualizarFondo() {
+  const menu = document.getElementById('menu');
+  if (!menu.classList.contains('hidden')) {
+    document.body.style.backgroundImage = "url('Fondo.png')";
+    document.body.style.backgroundRepeat = "no-repeat";
+    document.body.style.backgroundPosition = "center center";
+    document.body.style.backgroundSize = "contain";
+  } else {
+    document.body.style.backgroundImage = "none";
+  }
+}
+
+// Mostrar/ocultar secciones
 function mostrarMenu() {
   juegoUI.classList.add('hidden');
   calculadora.classList.add('hidden');
@@ -57,6 +69,7 @@ function mostrarMenu() {
   resultado.textContent = "";
   puzzleActual = null;
   juegoPausado = false;
+  actualizarFondo();
 }
 
 function mostrarJuego() {
@@ -66,6 +79,7 @@ function mostrarJuego() {
   mensaje.textContent = "Usa las flechas para moverte. Resuelve puzzles para abrir puertas.";
   resultado.textContent = "";
   iniciarJuego();
+  actualizarFondo();
 }
 
 function mostrarCalculadora() {
@@ -80,13 +94,14 @@ function mostrarCalculadora() {
   } else {
     inputExpr.placeholder = "Ingresa expresión (ej: 4+1i)";
   }
-
   inputExpr.focus();
+  actualizarFondo();
 }
 
-// Eventos botones menú
+// Eventos botones
 btnJugar.onclick = mostrarJuego;
 btnCalcular.onclick = mostrarCalculadora;
+btnVolverJuego.onclick = mostrarMenu;
 btnVolverCalc.onclick = mostrarMenu;
 
 // --- JUEGO con p5.js ---
@@ -137,7 +152,6 @@ const sketch = (p) => {
           mensaje.textContent = puzzles[puzzleActual].pregunta + ` (Intentos restantes: ${intentosMaximos - puertas[key].intentos})`;
           inputExpr.value = "";
           mostrarCalculadora();
-          inputExpr.focus();
         }
       }
     }
@@ -175,40 +189,18 @@ function drawHUD(p) {
 btnEval.onclick = () => {
   const userResp = inputExpr.value.trim();
 
-  // MODO LIBRE (desde botón "Calcular")
   if (!puzzleActual) {
     try {
       const resultadoEvaluado = math.evaluate(userResp);
-
-      if (math.typeOf(resultadoEvaluado) === "Complex") {
-        const re = resultadoEvaluado.re;
-        const im = resultadoEvaluado.im;
-        let texto = "";
-
-        if (re !== 0) texto += re;
-        if (im !== 0) {
-          if (im > 0 && re !== 0) texto += " + ";
-          else if (im < 0 && re !== 0) texto += " - ";
-          else if (im < 0 && re === 0) texto += "-";
-          texto += `${Math.abs(im)}i`;
-        }
-
-        if (texto === "") texto = "0";
-        resultado.textContent = `Resultado: ${texto}`;
-      } else {
-        resultado.textContent = `Resultado: ${resultadoEvaluado}`;
-      }
-
-    } catch (error) {
+      resultado.textContent = formatoResultado(resultadoEvaluado);
+    } catch {
       resultado.textContent = "Expresión inválida.";
     }
     return;
   }
 
-  // MODO JUEGO (resolver puzzle)
   const puzzle = puzzles[puzzleActual];
   const puerta = Object.entries(puertas).find(([pos, data]) => data.puzzleId === puzzleActual)[1];
-
   puerta.intentos++;
 
   try {
@@ -216,25 +208,9 @@ btnEval.onclick = () => {
     const resultadoCorrecto = math.evaluate(puzzle.respuesta);
     const esCorrecto = math.equal(resultadoUsuario, resultadoCorrecto);
 
-    let textoResultado = "";
-    if (math.typeOf(resultadoUsuario) === "Complex") {
-      const re = resultadoUsuario.re;
-      const im = resultadoUsuario.im;
-      if (re !== 0) textoResultado += re;
-      if (im !== 0) {
-        if (im > 0 && re !== 0) textoResultado += " + ";
-        else if (im < 0 && re !== 0) textoResultado += " - ";
-        else if (im < 0 && re === 0) textoResultado += "-";
-        textoResultado += `${Math.abs(im)}i`;
-      }
-      if (textoResultado === "") textoResultado = "0";
-    } else {
-      textoResultado = resultadoUsuario.toString();
-    }
-
     if (esCorrecto) {
       xp += 10;
-      resultado.textContent = `✔️ Resultado: ${textoResultado}\n¡Correcto! Has ganado 10 XP.`;
+      resultado.textContent = `✔️ ${formatoResultado(resultadoUsuario)}\n¡Correcto! Has ganado 10 XP.`;
 
       for (const [pos, data] of Object.entries(puertas)) {
         if (data.puzzleId === puzzleActual) {
@@ -247,13 +223,11 @@ btnEval.onclick = () => {
       puzzleActual = null;
       juegoPausado = false;
 
-      setTimeout(() => {
-        mostrarJuego();
-      }, 1500);
+      setTimeout(mostrarJuego, 1500);
     } else {
       manejarIntentoFallido(puerta);
     }
-  } catch (error) {
+  } catch {
     resultado.textContent = "Expresión inválida. Intentá de nuevo.";
     inputExpr.focus();
   }
@@ -273,5 +247,25 @@ function manejarIntentoFallido(puerta) {
   }
 }
 
-// Iniciar con menú visible
+// Utilidad para mostrar número complejo o real como string
+function formatoResultado(valor) {
+  if (math.typeOf(valor) === "Complex") {
+    const re = valor.re;
+    const im = valor.im;
+    let texto = "";
+
+    if (re !== 0) texto += re;
+    if (im !== 0) {
+      if (im > 0 && re !== 0) texto += " + ";
+      else if (im < 0 && re !== 0) texto += " - ";
+      else if (im < 0 && re === 0) texto += "-";
+      texto += `${Math.abs(im)}i`;
+    }
+    return texto || "0";
+  } else {
+    return `Resultado: ${valor}`;
+  }
+}
+
+// Al cargar
 mostrarMenu();
