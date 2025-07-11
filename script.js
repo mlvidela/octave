@@ -2,9 +2,10 @@ const btnJugar = document.getElementById('btnJugar');
 const btnCalcular = document.getElementById('btnCalcular');
 const juegoUI = document.getElementById('juegoUI');
 const calculadora = document.getElementById('calculadora');
-const btnVolverJuego = document.getElementById('btnVolverJuego');
 const btnVolverCalc = document.getElementById('btnVolverCalc');
-const mensaje = document.getElementById('mensaje');
+const mensaje = document.createElement('div');
+mensaje.id = 'mensaje';
+juegoUI.appendChild(mensaje);
 const inputExpr = document.getElementById('inputExpr');
 const btnEval = document.getElementById('btnEval');
 const resultado = document.getElementById('resultado');
@@ -47,19 +48,7 @@ let juegoPausado = false;
 let puzzleActual = null;
 let intentosMaximos = 3;
 
-function actualizarFondo() {
-  const menu = document.getElementById('menu');
-  if (!menu.classList.contains('hidden')) {
-    document.body.style.backgroundImage = "url('Fondo.png')";
-    document.body.style.backgroundRepeat = "no-repeat";
-    document.body.style.backgroundPosition = "center center";
-    document.body.style.backgroundSize = "contain";
-  } else {
-    document.body.style.backgroundImage = "none";
-  }
-}
-
-// Mostrar/ocultar secciones con clases
+// Mostrar/ocultar secciones usando clase .hidden
 function mostrarMenu() {
   juegoUI.classList.add('hidden');
   calculadora.classList.add('hidden');
@@ -68,7 +57,6 @@ function mostrarMenu() {
   resultado.textContent = "";
   puzzleActual = null;
   juegoPausado = false;
-  actualizarFondo();
 }
 
 function mostrarJuego() {
@@ -78,7 +66,6 @@ function mostrarJuego() {
   mensaje.textContent = "Usa las flechas para moverte. Resuelve puzzles para abrir puertas.";
   resultado.textContent = "";
   iniciarJuego();
-  actualizarFondo();
 }
 
 function mostrarCalculadora() {
@@ -93,16 +80,16 @@ function mostrarCalculadora() {
   } else {
     inputExpr.placeholder = "Ingresa expresión (ej: 4+1i)";
   }
-  actualizarFondo();
+
+  inputExpr.focus();
 }
 
-// Botones
+// Eventos botones menú
 btnJugar.onclick = mostrarJuego;
 btnCalcular.onclick = mostrarCalculadora;
-btnVolverJuego.onclick = mostrarMenu;
 btnVolverCalc.onclick = mostrarMenu;
 
-// --- JUEGO p5 ---
+// --- JUEGO con p5.js ---
 let canvas;
 
 function iniciarJuego() {
@@ -149,8 +136,8 @@ const sketch = (p) => {
           puzzleActual = puertas[key].puzzleId;
           mensaje.textContent = puzzles[puzzleActual].pregunta + ` (Intentos restantes: ${intentosMaximos - puertas[key].intentos})`;
           inputExpr.value = "";
-          inputExpr.focus();
           mostrarCalculadora();
+          inputExpr.focus();
         }
       }
     }
@@ -188,6 +175,7 @@ function drawHUD(p) {
 btnEval.onclick = () => {
   const userResp = inputExpr.value.trim();
 
+  // MODO LIBRE (desde botón "Calcular")
   if (!puzzleActual) {
     try {
       const resultadoEvaluado = math.evaluate(userResp);
@@ -217,6 +205,7 @@ btnEval.onclick = () => {
     return;
   }
 
+  // MODO JUEGO (resolver puzzle)
   const puzzle = puzzles[puzzleActual];
   const puerta = Object.entries(puertas).find(([pos, data]) => data.puzzleId === puzzleActual)[1];
 
@@ -262,10 +251,7 @@ btnEval.onclick = () => {
         mostrarJuego();
       }, 1500);
     } else {
-      const intentosRestantes = intentosMaximos - puerta.intentos;
-      resultado.textContent = `❌ Resultado: ${textoResultado}\nIncorrecto. Intentos restantes: ${intentosRestantes}`;
-      inputExpr.value = "";
-      inputExpr.focus();
+      manejarIntentoFallido(puerta);
     }
   } catch (error) {
     resultado.textContent = "Expresión inválida. Intentá de nuevo.";
@@ -279,7 +265,7 @@ function manejarIntentoFallido(puerta) {
     mensaje.textContent = "Has agotado tus intentos. Puzzle bloqueado.";
     puzzleActual = null;
     juegoPausado = false;
-    mostrarJuego();
+    setTimeout(mostrarJuego, 1500);
   } else {
     mensaje.textContent = `Incorrecto. Intentá de nuevo. Intentos restantes: ${intentosRestantes}`;
     inputExpr.value = "";
@@ -287,5 +273,5 @@ function manejarIntentoFallido(puerta) {
   }
 }
 
-// Al cargar, mostrar menú
+// Iniciar con menú visible
 mostrarMenu();
