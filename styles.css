@@ -5,99 +5,40 @@
 }
 
 body {
-  background-color: #142036;
-  color: white;
-  font-family: monospace;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  padding: 3rem;
-}
-
-/* Mostrar imagen solo cuando #menu NO tiene la clase hidden */
-#menu:not(.hidden) ~ body,
-body:has(#menu:not(.hidden)) {
   background-image: url('Fondo.png');
   background-repeat: no-repeat;
   background-position: center center;
-  background-size: contain;
+  background-size: cover;
+
+  color: white;
+  font-family: monospace;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
 }
 
-/* Alternativa: si no funciona bien con selector hermano, mejor se agrega o quita clase con JS */
-
-// Menú fijo arriba
 #menu {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+  padding: 20px 0;
+  background: rgba(0, 0, 0, 0.6);
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
-  padding: 0.8rem 1rem;
-  background: rgba(0, 0, 0, 0.7);
-
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
   z-index: 10;
 }
 
-/* Botones menú */
-#menu button {
-  padding: 10px 18px;
-  font-size: 1rem;
-  border-radius: 6px;
-  background: #208040;
-  border: none;
-  color: white;
-  cursor: pointer;
-  transition: background 0.3s ease;
-  min-width: 90px;
-}
-
-#menu button:hover {
-  background: #309050;
-}
-
-/* Contenedores principales */
-#juegoUI, #calculadora {
-  margin-top: 5rem; /* espacio para que no tape el menú fijo */
-  max-width: 600px;
-  width: 100%;
-  margin-left: auto;
-  margin-right: auto;
-  text-align: center;
-  padding: 1rem;
-  background: rgba(0, 0, 0, 0.5);
-  border-radius: 10px;
-}
-
-/* Mensajes */
-#mensaje, #resultado {
-  margin: 10px 0;
-  min-height: 30px;
-  font-size: 1.1rem;
-  white-space: pre-line;
-}
-
-/* Inputs */
-input {
-  padding: 10px;
-  font-size: 1rem;
-  width: 100%;
-  max-width: 100%;
-  border-radius: 6px;
-  border: none;
-  margin-bottom: 10px;
-}
-
-/* Botones evaluar y volver */
 button {
+  padding: 12px 24px;
+  font-size: 18px;
   background: #208040;
   border: none;
   border-radius: 6px;
   color: white;
   cursor: pointer;
-  padding: 12px 24px;
-  font-size: 1rem;
   transition: background 0.3s ease;
 }
 
@@ -105,32 +46,42 @@ button:hover {
   background: #309050;
 }
 
-/* Botones volver con ancho completo en móviles */
-.btnVolver {
-  margin-top: 15px;
-  background: #804020;
+.hidden {
+  display: none;
+}
+
+#juegoUI {
+  margin-top: 100px;
   width: 100%;
-  max-width: 300px;
-  padding: 12px;
-}
-
-@media (min-width: 600px) {
-  .btnVolver {
-    width: auto;
-  }
-}
-
-/* Ajuste canvas p5.js para que se adapte en móviles */
-#juegoUI canvas {
-  width: 100% !important;
-  height: auto !important;
   max-width: 600px;
-  border-radius: 10px;
-  display: block;
-  margin: 0 auto;
+  align-self: center;
+  text-align: center;
 }
 
-/* Texto en canvas */
-canvas {
-  touch-action: manipulation; /* mejora interacción en móviles */
+#calculadora {
+  margin-top: 100px;
+  width: 100%;
+  max-width: 600px;
+  text-align: center;
+  align-self: center;
+}
+
+#mensaje, #resultado {
+  margin: 10px 0;
+  min-height: 30px;
+  font-size: 18px;
+  white-space: pre-line;
+}
+
+input {
+  padding: 10px;
+  font-size: 16px;
+  width: 60%;
+  border-radius: 6px;
+  border: none;
+}
+
+.btnVolver {
+  margin-top: 20px;
+  background: #804020;
 }
