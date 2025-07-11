@@ -84,9 +84,7 @@ btnVolverCalc.onclick = mostrarMenu;
 let canvas;
 
 function iniciarJuego() {
-  if(canvas) {
-    canvas.remove();
-  }
+  if (canvas) canvas.remove();
   canvas = new p5(sketch, 'juegoUI');
 }
 
@@ -104,24 +102,24 @@ const sketch = (p) => {
   };
 
   p.keyPressed = () => {
-    if(juegoPausado) return;
+    if (juegoPausado) return;
 
     let newX = playerX;
     let newY = playerY;
 
-    if(p.keyCode === p.LEFT_ARROW) newX--;
-    else if(p.keyCode === p.RIGHT_ARROW) newX++;
-    else if(p.keyCode === p.UP_ARROW) newY--;
-    else if(p.keyCode === p.DOWN_ARROW) newY++;
+    if (p.keyCode === p.LEFT_ARROW) newX--;
+    else if (p.keyCode === p.RIGHT_ARROW) newX++;
+    else if (p.keyCode === p.UP_ARROW) newY--;
+    else if (p.keyCode === p.DOWN_ARROW) newY++;
 
-    if(newX >= 0 && newX < MAP_COLS && newY >= 0 && newY < MAP_ROWS) {
+    if (newX >= 0 && newX < MAP_COLS && newY >= 0 && newY < MAP_ROWS) {
       let tile = mapa[newY][newX];
-      if(tile === 0) {
+      if (tile === 0) {
         playerX = newX;
         playerY = newY;
-      } else if(tile === 2) {
+      } else if (tile === 2) {
         let key = `${newX},${newY}`;
-        if(puertas[key].abierta) {
+        if (puertas[key].abierta) {
           playerX = newX;
           playerY = newY;
         } else {
@@ -138,37 +136,68 @@ const sketch = (p) => {
 };
 
 function drawMap(p) {
-  for(let y=0; y<MAP_ROWS; y++) {
-    for(let x=0; x<MAP_COLS; x++) {
-      if(mapa[y][x] === 1) p.fill(40,90,30);
-      else if(mapa[y][x] === 2) p.fill(200,80,0);
+  for (let y = 0; y < MAP_ROWS; y++) {
+    for (let x = 0; x < MAP_COLS; x++) {
+      if (mapa[y][x] === 1) p.fill(40,90,30);
+      else if (mapa[y][x] === 2) p.fill(200,80,0);
       else p.fill(150,200,150);
 
-      p.rect(x*TILE_SIZE, y*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+      p.rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
     }
   }
 }
 
 function drawPlayer(p) {
   p.fill(255,200,0);
-  p.rect(playerX*TILE_SIZE, playerY*TILE_SIZE, TILE_SIZE, TILE_SIZE);
+  p.rect(playerX * TILE_SIZE, playerY * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 }
 
 function drawHUD(p) {
   p.fill(0,0,0,180);
-  p.rect(0, MAP_ROWS*TILE_SIZE, MAP_COLS*TILE_SIZE, 60);
+  p.rect(0, MAP_ROWS * TILE_SIZE, MAP_COLS * TILE_SIZE, 60);
   p.fill(255);
   p.textSize(18);
   p.textFont('monospace');
   p.textAlign(p.LEFT, p.CENTER);
-  p.text(`XP: ${xp}`, 20, MAP_ROWS*TILE_SIZE + 30);
+  p.text(`XP: ${xp}`, 20, MAP_ROWS * TILE_SIZE + 30);
 }
 
 // --- CALCULADORA ---
 btnEval.onclick = () => {
-  if (!puzzleActual) return;
-
   const userResp = inputExpr.value.trim();
+
+  // MODO LIBRE (desde botón "Calcular")
+  if (!puzzleActual) {
+    try {
+      const resultadoEvaluado = math.evaluate(userResp);
+
+      // Mostrar resultados complejos con formato "a + bi"
+      if (math.typeOf(resultadoEvaluado) === "Complex") {
+        const re = resultadoEvaluado.re;
+        const im = resultadoEvaluado.im;
+        let texto = "";
+
+        if (re !== 0) texto += re;
+        if (im !== 0) {
+          if (im > 0 && re !== 0) texto += " + ";
+          else if (im < 0 && re !== 0) texto += " - ";
+          else if (im < 0 && re === 0) texto += "-";
+          texto += `${Math.abs(im)}i`;
+        }
+
+        if (texto === "") texto = "0";
+        resultado.textContent = `Resultado: ${texto}`;
+      } else {
+        resultado.textContent = `Resultado: ${resultadoEvaluado}`;
+      }
+
+    } catch (error) {
+      resultado.textContent = "Expresión inválida.";
+    }
+    return;
+  }
+
+  // MODO JUEGO (resolver puzzle)
   const puzzle = puzzles[puzzleActual];
   const puerta = Object.entries(puertas).find(([pos, data]) => data.puzzleId === puzzleActual)[1];
 
