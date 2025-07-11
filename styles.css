@@ -5,25 +5,22 @@
 }
 
 body {
-  background-color: #142036; /* azul oscuro de fondo */
+  background-color: #142036;
   color: white;
   font-family: monospace;
   min-height: 100vh;
-
   display: flex;
   flex-direction: column;
-
   padding: 3rem;
 }
 
-/* Fondo imagen solo cuando #menu está visible */
+/* Mostrar imagen solo cuando #menu NO tiene la clase hidden */
 #menu:not(.hidden) ~ body,
-#menu:not(.hidden) {
+body:has(#menu:not(.hidden)) {
   background-image: url('Fondo.png');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;
-  min-height: 70vh;
 }
 
 /* Alternativa: si no funciona bien con selector hermano, mejor se agrega o quita clase con JS */
